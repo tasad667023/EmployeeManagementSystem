@@ -21,10 +21,22 @@ function initialQuestions() {
                     console.log("viewing");
                     viewRoles();
                     break;
-                    case "View employees":
-                        console.log("i can see this");
-                        viewEmployees();
-                        break;
+                case "View employees":
+                    console.log("i can see this");
+                    viewEmployees();
+                    break;
+                case "add department":
+                    console.log("view");
+                    addDepartment();
+                    break;
+                case "add role":
+                    console.log("view");
+                    addRole();
+                    break;
+                case "add employee":
+                    console.log("view");
+                    addEmployee();
+                    break;
                 default:
                     break;
             }
@@ -47,6 +59,27 @@ function viewRoles() {
 }
 function viewEmployees() {
     connection.query("SELECT * FROM employee", function (err, res) {
+        console.log("working");
+        if (err) throw err;
+        ctable.getTable(res);
+    })
+}
+function addDepartment() {
+    connection.query("INSERT INTO department", function (err, res) {
+        console.log("working");
+        if (err) throw err;
+        ctable.getTable(res);
+    })
+}
+function addRole() {
+    connection.query("INSERT INTO role", function (err, res) {
+        console.log("working");
+        if (err) throw err;
+        ctable.getTable(res);
+    })
+}
+function addEmployee() {
+    connection.query("INSERT INTO employee", function (err, res) {
         console.log("working");
         if (err) throw err;
         ctable.getTable(res);
