@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const connection = require('./config/db');
 const ctable = require("console.table");
+const { connectableObservableDescriptor } = require('rxjs/internal/observable/ConnectableObservable');
 
 function initialQuestions() {
 
@@ -25,15 +26,15 @@ function initialQuestions() {
                     console.log("i can see this");
                     viewEmployees();
                     break;
-                case "add department":
+                case "Add department":
                     console.log("view");
                     addDepartment();
                     break;
-                case "add role":
+                case "Add role":
                     console.log("view");
                     addRole();
                     break;
-                case "add employee":
+                case "Add employee":
                     console.log("view");
                     addEmployee();
                     break;
@@ -65,26 +66,92 @@ function viewEmployees() {
     })
 }
 function addDepartment() {
-    connection.query("INSERT INTO department", function (err, res) {
-        console.log("working");
-        if (err) throw err;
-        ctable.getTable(res);
+    inquirer.prompt({
+        type: "input",
+        message: "What kind of department would you like to add?",
+        name: "departmentAnswer"
     })
+        .then(function (response) {
+            connection.query("INSERT INTO department SET ?", { name: response.departmentAnswer }, function (err, res) {
+                if (err) throw err;
+                console.log("department successfully added!")
+            })
+        })
 }
 function addRole() {
-    connection.query("INSERT INTO role", function (err, res) {
-        console.log("working");
+    connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
-        ctable.getTable(res);
+        console.log(res);
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "What kind of role would you like to add?",
+                name: "roleAnswer"
+            },
+            {
+                type: "input",
+                message: "What is the role salary?",
+                name: "roleSalary"
+            },
+            {
+                type: "list",
+                message: "What department does this role belong too?",
+                name: "roleDepartment",
+                choices: res
+            },
+
+        ])
+            .then(function (response) {
+                console.log(response) //response holds all the answers to the inquirer.prompt
+                connection.query("SELECT id FROM department WHERE ?", { name: response.roleDepartment }, function (err, res) {
+                    if (err) throw err;
+                    console.log(res); //res holds the id number for the matching departments 
+                    connection.query("INSERT INTO role SET ?", { title: response.roleAnswer, salary: response.roleSalary, department_id: res[0].id }, function (err, res) {
+                        if (err) throw err;
+                        console.log("role successfully added!")
+                    })
+                })
+            })
     })
 }
 function addEmployee() {
-    connection.query("INSERT INTO employee", function (err, res) {
-        console.log("working");
+    connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
-        ctable.getTable(res);
+        console.log(res);
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "What kind of role would you like to add?",
+                name: "roleAnswer"
+            },
+            {
+                type: "input",
+                message: "What is the role salary?",
+                name: "roleSalary"
+            },
+            {
+                type: "list",
+                message: "What department does this role belong too?",
+                name: "roleDepartment",
+                choices: res
+            },
+
+        ])
+            .then(function (response) {
+                console.log(response) //response holds all the answers to the inquirer.prompt
+                connection.query("SELECT id FROM department WHERE ?", { name: response.roleDepartment }, function (err, res) {
+                    if (err) throw err;
+                    console.log(res); //res holds the id number for the matching departments 
+                    connection.query("INSERT INTO role SET ?", { title: response.roleAnswer, salary: response.roleSalary, department_id: res[0].id }, function (err, res) {
+                        if (err) throw err;
+                        console.log("role successfully added!")
+                    })
+                })
+            })
     })
 }
+
+
 
 
 initialQuestions();
