@@ -115,19 +115,19 @@ function addRole() {
     })
 }
 function addEmployee() {
-    connection.query("SELECT * FROM department", function (err, res) {
+    connection.query("SELECT title AS name FROM role", function (err, res) {
         if (err) throw err;
         console.log(res);
         inquirer.prompt([
             {
                 type: "input",
-                message: "What kind of role would you like to add?",
-                name: "roleAnswer"
+                message: "What is the first name of the employee?",
+                name: "employeeFirstName"
             },
             {
                 type: "input",
-                message: "What is the role salary?",
-                name: "roleSalary"
+                message: "What is the last name of the employee?",
+                name: "employeeLastName"
             },
             {
                 type: "list",
@@ -135,17 +135,31 @@ function addEmployee() {
                 name: "roleDepartment",
                 choices: res
             },
-
+            {
+                type: "input",
+                message: "What role is this employee filling?",
+                name: "filling"
+            },
+            // {
+            //     type: "confirm",
+            //     message: "Does this employee report to a manager?",
+            //     name: "managed"
+            //  },
+            //  {
+            //     type: "list",
+            //     message: "Who is this employee's manager?",
+            //     name: "employeeManager",
+            //     choices: res,
+            //  }
         ])
-            .then(function (response) {
-                console.log(response) //response holds all the answers to the inquirer.prompt
-                connection.query("SELECT id FROM department WHERE ?", { name: response.roleDepartment }, function (err, res) {
+        .then(function (response) {
+            console.log(response) //response holds all the answers to the inquirer.prompt
+            connection.query("SELECT id FROM role WHERE ?", { title: response.filling }, function (err, res) {
+                if (err) throw err;
+            console.log(res);
+                connection.query("INSERT INTO role SET ?", {  first_name: response.employeeFirstName, last_name: response.employeeLastName, role_id: res[0].id }, function (err, res) {
                     if (err) throw err;
-                    console.log(res); //res holds the id number for the matching departments 
-                    connection.query("INSERT INTO role SET ?", { title: response.roleAnswer, salary: response.roleSalary, department_id: res[0].id }, function (err, res) {
-                        if (err) throw err;
-                        console.log("role successfully added!")
-                    })
+                    console.log("role successfully added!")
                 })
             })
     })
