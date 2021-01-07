@@ -38,6 +38,10 @@ function initialQuestions() {
                     console.log("view");
                     addEmployee();
                     break;
+                case "Update employee role":
+                    console.log("view");
+                    updateEmployeeRole();
+                    break;
                 default:
                     break;
             }
@@ -131,39 +135,72 @@ function addEmployee() {
             },
             {
                 type: "list",
-                message: "What department does this role belong too?",
+                message: "What role is this employee filling?",
                 name: "roleDepartment",
                 choices: res
             },
             {
-                type: "input",
-                message: "What role is this employee filling?",
-                name: "filling"
+                type: "confirm",
+                message: "Does this employee report to a manager?",
+                name: "managed"
             },
-            // {
-            //     type: "confirm",
-            //     message: "Does this employee report to a manager?",
-            //     name: "managed"
-            //  },
-            //  {
-            //     type: "list",
-            //     message: "Who is this employee's manager?",
-            //     name: "employeeManager",
-            //     choices: res,
-            //  }
         ])
-        .then(function (response) {
-            console.log(response) //response holds all the answers to the inquirer.prompt
-            connection.query("SELECT id FROM role WHERE ?", { title: response.filling }, function (err, res) {
-                if (err) throw err;
-            console.log(res);
-                connection.query("INSERT INTO role SET ?", {  first_name: response.employeeFirstName, last_name: response.employeeLastName, role_id: res[0].id }, function (err, res) {
-                    if (err) throw err;
-                    console.log("role successfully added!")
-                })
+            .then(function (response) {
+                if (response.managed) {
+                    //creation with manager
+                    connection.query("SELECT id, CONCAT(first_name,' ' , last_name) AS name FROM employee", function (err, res) {
+                        if (err) throw err;
+                        console.log(res)
+                        inquirer.prompt(
+                            {
+                                type: "list",
+                                message: "Who is this employee's manager?",
+                                name: "employeeManager",
+                                choices: res,
+                            }
+                        )
+                            .then(function (userSelection) {
+                                var manager = userSelection.employeeManager;
+                                var employeeList = res;
+                                var managerMatch = employeeList.find(({ name }) => name === manager);
+                                console.log(managerMatch.id);
+                                connection.query("SELECT id FROM role WHERE ?", { title: response.roleDepartment }, function (err, res) {
+                                    if (err) throw err;
+                                    console.log(res);
+                                    connection.query("INSERT INTO employee SET ? ", { first_name: response.employeeFirstName, last_name: response.employeeLastName, role_id: res[0].id, manager_id: managerMatch.id }, function (err, res) {
+                                        if (err) throw err;
+                                        console.log("role successfully added!");
+                                    })
+                                })
+                            })
+                    })
+                }
+                else {
+                    // this code will run if the answer is no to the managed question
+                    console.log(response) //response holds all the answers to the inquirer.prompt
+                    connection.query("SELECT id FROM role WHERE ?", { title: response.roleDepartment }, function (err, res) {
+                        if (err) throw err;
+                        console.log(res);
+                        connection.query("INSERT INTO employee SET ? ", { first_name: response.employeeFirstName, last_name: response.employeeLastName, role_id: res[0].id }, function (err, res) {
+                            if (err) throw err;
+                            console.log("role successfully added!");
+                        })
+                    })
+                }
             })
     })
 }
+function updateEmployeeRole(){
+//Get list of all employees 
+//inquier.prompt to ask question "What employee do you want to update?"
+//connection.query to get a list of all the roles 
+//after we have the list, another inquirer.promt to ask what the new role is
+//need to get the role id- connection.query 
+//another connection.query to update the employee --> 
+//after updating the employee- you can restart the program 
+}
+
+
 
 
 
