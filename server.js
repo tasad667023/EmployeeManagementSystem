@@ -15,31 +15,31 @@ function initialQuestions() {
             console.log(answer.choice);
             switch (answer.choice) {
                 case "View departments":
-                    console.log("view");
+                    // console.log("view");
                     viewDepartments();
                     break;
                 case "View roles":
-                    console.log("viewing");
+                    // console.log("viewing");
                     viewRoles();
                     break;
                 case "View employees":
-                    console.log("i can see this");
+                    // console.log("i can see this");
                     viewEmployees();
                     break;
                 case "Add department":
-                    console.log("view");
+                    // console.log("view");
                     addDepartment();
                     break;
                 case "Add role":
-                    console.log("view");
+                    // console.log("view");
                     addRole();
                     break;
                 case "Add employee":
-                    console.log("view");
+                    // console.log("view");
                     addEmployee();
                     break;
                 case "Update employee role":
-                    console.log("view");
+                    // console.log("view");
                     updateEmployeeRole();
                     break;
                 default:
@@ -50,21 +50,21 @@ function initialQuestions() {
 
 function viewDepartments() {
     connection.query("SELECT * FROM department", function (err, res) {
-        console.log("working");
+        // console.log("working");
         if (err) throw err;
         ctable.getTable(res);
     })
 }
 function viewRoles() {
     connection.query("SELECT * FROM role", function (err, res) {
-        console.log("working");
+        // console.log("working");
         if (err) throw err;
         ctable.getTable(res);
     })
 }
 function viewEmployees() {
     connection.query("SELECT * FROM employee", function (err, res) {
-        console.log("working");
+        // console.log("working");
         if (err) throw err;
         ctable.getTable(res);
     })
@@ -156,12 +156,12 @@ function addEmployee() {
                                 type: "list",
                                 message: "Who is this employee's manager?",
                                 name: "employeeManager",
-                                choices: res,
+                                choices: rest,
                             }
                         )
                             .then(function (userSelection) {
                                 var manager = userSelection.employeeManager;
-                                var employeeList = res;
+                                var employeeList = rest;
                                 var managerMatch = employeeList.find(({ name }) => name === manager);
                                 console.log(managerMatch.id);
                                 connection.query("SELECT id FROM role WHERE ?", { title: response.roleDepartment }, function (err, res) {
@@ -190,44 +190,40 @@ function addEmployee() {
             })
     })
 }
-function updateEmployeeRole() {
-    //Get list of all employees 
-    connection.query("SELECT * FROM employee", function (err, res) {
-        console.log("working");
-        if (err) throw err;
-        //inquier.prompt to ask question "What employee do you want to update?"
-        inquirer.prompt(
-            {
-                type: "input",
-                message: "Which employee role do you want to update?",
-                name: "employeeList"
-            }
-        )
-        //connection.query to get a list of all the roles 
-        connection.query("SELECT * FROM role", function (err, res) {
-            console.log("working");
-            if (err) throw err;
-        //after we have the list, another inquirer.promt to ask what the new role is
-        inquirer.prompt(
-            {
-                type: "input",
-                message: "Which is the new role you want to update?",
-                name: "employeeUpdatedRole"
-            }
-        )
-        //need to get the role id- connection.query 
-        connection.query("SELECT id FROM department WHERE ?", { name: response.roleDepartment }, function (err, res) {
-            if (err) throw err;
-            console.log(res);
-        }
-        //another connection.query to update the employee --> 
-        //after updating the employee- you can restart the program 
-        }
-
-    )
-
-
-})
-}
+// function updateEmployeeRole() {
+//     //Get list of all employees 
+//     connection.query("SELECT * FROM employee", function (err, res) {
+//         console.log("working");
+//         if (err) throw err;
+//         //inquier.prompt to ask question "What employee do you want to update?"
+//         inquirer.prompt(
+//             {
+//                 type: "input",
+//                 message: "Which employee role do you want to update?",
+//                 name: "employeeList"
+//             }
+//         )
+//         //connection.query to get a list of all the roles 
+//         connection.query("SELECT * FROM role", function (err, res) {
+//             console.log("working");
+//             if (err) throw err;
+//         //after we have the list, another inquirer.promt to ask what the new role is
+//         inquirer.prompt(
+//             {
+//                 type: "input",
+//                 message: "Which is the new role you want to update?",
+//                 name: "employeeUpdatedRole"
+//             }
+//         )
+//         //need to get the role id- connection.query 
+//         connection.query("SELECT id FROM department WHERE ?", { name: response.roleDepartment }, function (err, res) {
+//             if (err) throw err;
+//             console.log(res);
+//         }
+//         //another connection.query to update the employee --> 
+//         //after updating the employee- you can restart the program 
+//     )}
+// })
+// }
 
 initialQuestions();
