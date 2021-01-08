@@ -190,19 +190,44 @@ function addEmployee() {
             })
     })
 }
-function updateEmployeeRole(){
-//Get list of all employees 
-//inquier.prompt to ask question "What employee do you want to update?"
-//connection.query to get a list of all the roles 
-//after we have the list, another inquirer.promt to ask what the new role is
-//need to get the role id- connection.query 
-//another connection.query to update the employee --> 
-//after updating the employee- you can restart the program 
+function updateEmployeeRole() {
+    //Get list of all employees 
+    connection.query("SELECT * FROM employee", function (err, res) {
+        console.log("working");
+        if (err) throw err;
+        //inquier.prompt to ask question "What employee do you want to update?"
+        inquirer.prompt(
+            {
+                type: "input",
+                message: "Which employee role do you want to update?",
+                name: "employeeList"
+            }
+        )
+        //connection.query to get a list of all the roles 
+        connection.query("SELECT * FROM role", function (err, res) {
+            console.log("working");
+            if (err) throw err;
+        //after we have the list, another inquirer.promt to ask what the new role is
+        inquirer.prompt(
+            {
+                type: "input",
+                message: "Which is the new role you want to update?",
+                name: "employeeUpdatedRole"
+            }
+        )
+        //need to get the role id- connection.query 
+        connection.query("SELECT id FROM department WHERE ?", { name: response.roleDepartment }, function (err, res) {
+            if (err) throw err;
+            console.log(res);
+        }
+        //another connection.query to update the employee --> 
+        //after updating the employee- you can restart the program 
+        }
+
+    )
+
+
+})
 }
-
-
-
-
-
 
 initialQuestions();
